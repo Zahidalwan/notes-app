@@ -5,6 +5,9 @@ function App() {
   // State untuk menyimpan semua catatan
   const [notes, setNotes] = useState([]);
 
+  // State tambahan untuk fitur pencarian 🔍
+  const [searchQuery, setSearchQuery] = useState("");
+
   // URL API backend kamu
   const baseUrl = "https://notes-app-blush-mu.vercel.app";
 
@@ -83,18 +86,30 @@ function App() {
   };
 
   // =======================
+  // 🔍 Filter hasil pencarian
+  // =======================
+  const filteredNotes = notes.filter(
+    (note) =>
+      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      note.content.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // =======================
   // 🧱 Tampilan utama aplikasi
   // =======================
   return (
     <>
       <Navbar />
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-28 pb-10 flex flex-col items-center">
+        {/* Input pencarian */}
+        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
         {/* Form untuk tambah catatan */}
         <NoteForm onAddNote={addNote} />
 
-        {/* Daftar catatan */}
+        {/* Daftar catatan (dengan filter pencarian) */}
         <NoteList
-          notes={notes}
+          notes={filteredNotes}
           onDelete={handleDelete}
           onUpdate={handleUpdateNote}
         />
@@ -114,13 +129,29 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center px-6 py-4">
         <div className="flex items-center gap-2">
           {/* Logo aplikasi */}
-
           <span className="font-semibold text-xl text-gray-800 dark:text-gray-100">
             MY Notes App
           </span>
         </div>
       </div>
     </nav>
+  );
+};
+
+// =================================
+// 🔎 Komponen Search Bar
+// =================================
+const SearchBar = ({ searchQuery, setSearchQuery }) => {
+  return (
+    <div className="container max-w-lg mb-6 px-5">
+      <input
+        type="text"
+        placeholder="Search notes..."
+        className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-3 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)} // ubah nilai searchQuery saat user mengetik
+      />
+    </div>
   );
 };
 
